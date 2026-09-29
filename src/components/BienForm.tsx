@@ -89,6 +89,28 @@ export function BienForm({ bien, referentielLoyers, baremeConfort, onSubmit, onC
         onChange={(surfaceConfort, equipements) => setForm({ ...form, surfaceConfort, equipements })}
       />
       <div>
+        <label htmlFor="surfaceConfort" className="block text-sm font-medium">
+          Surface confort (m2) — surcharge manuelle
+        </label>
+        <input
+          id="surfaceConfort"
+          type="number"
+          step="0.1"
+          value={form.surfaceConfort}
+          // Editing this field directly means "I'm overriding the computed
+          // value": `equipements: null` is the documented marker for that.
+          onChange={(e) =>
+            setForm({ ...form, surfaceConfort: Number(e.target.value) || 0, equipements: null })
+          }
+          className="mt-1 w-full rounded border px-3 py-2"
+        />
+        <p className="mt-1 text-sm text-slate-500">
+          {form.equipements === null
+            ? 'Valeur saisie manuellement : modifier un équipement ci-dessus recalculera la surface confort.'
+            : 'Calculée à partir des équipements ci-dessus ; la modifier ici passe en surcharge manuelle.'}
+        </p>
+      </div>
+      <div>
         <label htmlFor="prixAchat" className="block text-sm font-medium">
           Prix achat
         </label>

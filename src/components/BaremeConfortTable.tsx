@@ -1,27 +1,43 @@
 'use client';
 
+import { useEffect, useState, type FormEvent } from 'react';
 import type { BaremeConfortItem } from '@/lib/types';
 
 interface BaremeConfortTableProps {
   rows: BaremeConfortItem[];
-  onChange: (rows: BaremeConfortItem[]) => void;
+  onSave: (rows: BaremeConfortItem[]) => void;
 }
 
-export function BaremeConfortTable({ rows, onChange }: BaremeConfortTableProps) {
+export function BaremeConfortTable({ rows, onSave }: BaremeConfortTableProps) {
+  // Local state so typing is instant: the parent only sees the rows when the
+  // user explicitly submits (spec: "sauvegarde explicite […] pas à chaque frappe").
+  const [local, setLocal] = useState<BaremeConfortItem[]>(rows);
+
+  // Resync when the parent hands down a new array from an external source
+  // (e.g. a post-conflict reload) so we don't keep echoing stale rows.
+  useEffect(() => {
+    setLocal(rows);
+  }, [rows]);
+
   function updateRow(index: number, patch: Partial<BaremeConfortItem>) {
-    onChange(rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    setLocal((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row)));
   }
 
   function removeRow(index: number) {
-    onChange(rows.filter((_, i) => i !== index));
+    setLocal((current) => current.filter((_, i) => i !== index));
   }
 
   function addRow() {
-    onChange([...rows, { label: '', m2Bonus: 0 }]);
+    setLocal((current) => [...current, { label: '', m2Bonus: 0 }]);
+  }
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    onSave(local);
   }
 
   return (
-    <div className="p-8">
+    <form onSubmit={handleSubmit} className="p-8">
       <h1 className="mb-4 text-xl font-semibold">Barème confort</h1>
       <table className="w-full border-collapse text-sm">
         <thead>
@@ -32,10 +48,11 @@ export function BaremeConfortTable({ rows, onChange }: BaremeConfortTableProps) 
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, index) => (
+          {local.map((row, index) => (
             <tr key={index} className="border-b">
               <td className="p-2">
                 <input
+                  aria-label={`Équipement ligne ${index + 1}`}
                   value={row.label}
                   onChange={(e) => updateRow(index, { label: e.target.value })}
                   className="w-full rounded border px-2 py-1"
@@ -43,6 +60,7 @@ export function BaremeConfortTable({ rows, onChange }: BaremeConfortTableProps) 
               </td>
               <td className="p-2">
                 <input
+                  aria-label={`m² bonus ligne ${index + 1}`}
                   type="number"
                   value={row.m2Bonus}
                   onChange={(e) => updateRow(index, { m2Bonus: Number(e.target.value) || 0 })}
@@ -50,7 +68,7 @@ export function BaremeConfortTable({ rows, onChange }: BaremeConfortTableProps) 
                 />
               </td>
               <td className="p-2">
-                <button onClick={() => removeRow(index)} className="text-red-600">
+                <button type="button" onClick={() => removeRow(index)} className="text-red-600">
                   Supprimer
                 </button>
               </td>
@@ -58,9 +76,14 @@ export function BaremeConfortTable({ rows, onChange }: BaremeConfortTableProps) 
           ))}
         </tbody>
       </table>
-      <button onClick={addRow} className="mt-4 rounded bg-slate-900 px-4 py-2 text-white">
-        Ajouter une ligne
-      </button>
-    </div>
+      <div className="mt-4 flex gap-2">
+        <button type="button" onClick={addRow} className="rounded border px-4 py-2">
+          Ajouter une ligne
+        </button>
+        <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
+          Enregistrer
+        </button>
+      </div>
+    </form>
   );
 }

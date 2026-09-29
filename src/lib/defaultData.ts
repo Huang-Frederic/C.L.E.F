@@ -1,4 +1,4 @@
-import type { Bien, DataStore } from './types';
+import type { Bien, DataStore, Settings } from './types';
 
 export function createDefaultDataStore(): DataStore {
   return {
@@ -35,7 +35,11 @@ export function createDefaultDataStore(): DataStore {
   };
 }
 
-export function createEmptyBien(id: string): Bien {
+/**
+ * A brand-new bien seeds its credit terms from the user-editable settings
+ * rather than from hardcoded constants.
+ */
+export function createEmptyBien(id: string, settings: Settings): Bien {
   return {
     id,
     lienAnnonce: '',
@@ -46,8 +50,8 @@ export function createEmptyBien(id: string): Bien {
     equipements: {},
     prixAchat: 0,
     prixTravaux: 0,
-    tauxCredit: 3,
-    dureeCreditAnnees: 25,
+    tauxCredit: settings.tauxCreditParDefaut,
+    dureeCreditAnnees: settings.dureeCreditParDefautAnnees,
     loyerM2Override: null,
     taxeFonciere: 0,
     chargesCopro: 0,

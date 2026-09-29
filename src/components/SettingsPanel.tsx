@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import type { Settings } from '@/lib/types';
 
 interface SettingsPanelProps {
   settings: Settings;
-  onChange: (settings: Settings) => void;
+  onSave: (settings: Settings) => void;
 }
 
-export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
+export function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
   // Local state mirrors `settings` so each keystroke is reflected immediately,
   // even if the parent doesn't feed the updated value back into `settings`
   // synchronously (e.g. while a save is in flight).
@@ -22,13 +22,17 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
   }, [settings]);
 
   function handleFieldChange(field: keyof Settings, value: number) {
-    const next = { ...local, [field]: value };
-    setLocal(next);
-    onChange(next);
+    setLocal((current) => ({ ...current, [field]: value }));
+  }
+
+  // Explicit save only (spec: "sauvegarde explicite […] pas à chaque frappe").
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    onSave(local);
   }
 
   return (
-    <div className="space-y-4 rounded border p-4">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded border p-4">
       <h2 className="font-medium">Paramètres</h2>
       <div>
         <label htmlFor="objectifRentabilitePourcent" className="block text-sm font-medium">
@@ -72,6 +76,9 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
           className="mt-1 w-full rounded border px-3 py-2"
         />
       </div>
-    </div>
+      <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
+        Enregistrer les paramètres
+      </button>
+    </form>
   );
 }

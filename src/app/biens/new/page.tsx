@@ -1,32 +1,36 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDataStore } from '@/hooks/useDataStore';
+import { DataPageShell, type DataPageContext } from '@/components/DataPageShell';
 import { BienForm } from '@/components/BienForm';
 import { createEmptyBien } from '@/lib/defaultData';
 import { randomUUID } from '@/lib/randomId';
 import type { Bien } from '@/lib/types';
 
-export default function NewBienPage() {
-  const { data, loading, error, save } = useDataStore();
+function NewBienEditor({ data, save }: DataPageContext) {
   const router = useRouter();
-
-  if (loading) return <main className="p-8">Chargement…</main>;
-  if (error) return <main className="p-8 text-red-600">{error}</main>;
-  if (!data) return null;
+  // Seed the new bien from the user-editable default credit settings.
+  const emptyBien = useMemo(() => createEmptyBien(randomUUID(), data.settings), [data.settings]);
 
   async function handleSubmit(bien: Bien) {
-    await save({ ...data!, biens: [...data!.biens, bien] });
-    router.push('/');
+    const result = await save({ ...data, biens: [...data.biens, bien] });
+    // Only leave the form once the save really succeeded: on a conflict or an
+    // error the user must keep their input and see the modal / error banner.
+    if (result.ok === true) router.push('/');
   }
 
   return (
     <BienForm
-      bien={createEmptyBien(randomUUID())}
+      bien={emptyBien}
       referentielLoyers={data.referentielLoyers}
       baremeConfort={data.baremeConfort}
       onSubmit={handleSubmit}
       onCancel={() => router.push('/')}
     />
   );
+}
+
+export default function NewBienPage() {
+  return <DataPageShell>{(ctx) => <NewBienEditor {...ctx} />}</DataPageShell>;
 }

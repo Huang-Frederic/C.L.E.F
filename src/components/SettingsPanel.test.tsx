@@ -7,19 +7,21 @@ import type { Settings } from '@/lib/types';
 const settings: Settings = { objectifRentabilitePourcent: 6, tauxCreditParDefaut: 3, dureeCreditParDefautAnnees: 25 };
 
 describe('SettingsPanel', () => {
-  it('calls onChange with the updated objectif de rentabilité', async () => {
-    const onChange = vi.fn();
-    render(<SettingsPanel settings={settings} onChange={onChange} />);
+  it('reports the updated objectif de rentabilité on explicit save only', async () => {
+    const onSave = vi.fn();
+    render(<SettingsPanel settings={settings} onSave={onSave} />);
 
     await userEvent.clear(screen.getByLabelText('Objectif rentabilité (%)'));
     await userEvent.type(screen.getByLabelText('Objectif rentabilité (%)'), '7');
+    expect(onSave).not.toHaveBeenCalled();
 
-    expect(onChange).toHaveBeenLastCalledWith({ ...settings, objectifRentabilitePourcent: 7 });
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les paramètres' }));
+    expect(onSave).toHaveBeenCalledWith({ ...settings, objectifRentabilitePourcent: 7 });
   });
 
   it('discards a stale unsaved edit and resyncs when the settings prop changes externally (e.g. a post-conflict reload)', async () => {
-    const onChange = vi.fn();
-    const { rerender } = render(<SettingsPanel settings={settings} onChange={onChange} />);
+    const onSave = vi.fn();
+    const { rerender } = render(<SettingsPanel settings={settings} onSave={onSave} />);
 
     // Simulate the user typing an edit that never gets saved (e.g. save() 409-conflicts).
     await userEvent.clear(screen.getByLabelText('Objectif rentabilité (%)'));
@@ -29,7 +31,7 @@ describe('SettingsPanel', () => {
     // Simulate a reload: the parent hands down a fresh settings object from the server,
     // without remounting SettingsPanel.
     const reloaded: Settings = { ...settings, objectifRentabilitePourcent: 42 };
-    rerender(<SettingsPanel settings={reloaded} onChange={onChange} />);
+    rerender(<SettingsPanel settings={reloaded} onSave={onSave} />);
 
     expect(screen.getByLabelText('Objectif rentabilité (%)')).toHaveValue(42);
   });

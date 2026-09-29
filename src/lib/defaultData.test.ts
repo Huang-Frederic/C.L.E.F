@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultDataStore } from './defaultData';
+import { createDefaultDataStore, createEmptyBien } from './defaultData';
 
 describe('createDefaultDataStore', () => {
   it('returns an empty biens list and a pre-filled bareme confort', () => {
@@ -13,5 +13,19 @@ describe('createDefaultDataStore', () => {
   it('defaults settings to a 6% target yield', () => {
     const data = createDefaultDataStore();
     expect(data.settings.objectifRentabilitePourcent).toBe(6);
+  });
+});
+
+describe('createEmptyBien', () => {
+  it('seeds the credit terms from the settings instead of hardcoded values', () => {
+    const bien = createEmptyBien('b1', {
+      objectifRentabilitePourcent: 6,
+      tauxCreditParDefaut: 4.2,
+      dureeCreditParDefautAnnees: 20,
+    });
+
+    expect(bien.tauxCredit).toBe(4.2);
+    expect(bien.dureeCreditAnnees).toBe(20);
+    expect(bien.id).toBe('b1');
   });
 });

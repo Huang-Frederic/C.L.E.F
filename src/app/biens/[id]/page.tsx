@@ -1,25 +1,25 @@
 'use client';
 
 import { useRouter, useParams } from 'next/navigation';
-import { useDataStore } from '@/hooks/useDataStore';
+import { DataPageShell, type DataPageContext } from '@/components/DataPageShell';
 import { BienForm } from '@/components/BienForm';
 import type { Bien } from '@/lib/types';
 
-export default function BienDetailPage() {
-  const { data, loading, error, save } = useDataStore();
+function BienEditor({ data, save }: DataPageContext) {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-  if (loading) return <main className="p-8">Chargement…</main>;
-  if (error) return <main className="p-8 text-red-600">{error}</main>;
-  if (!data) return null;
-
   const bien = data.biens.find((b) => b.id === params.id);
-  if (!bien) return <main className="p-8">Bien introuvable.</main>;
+  if (!bien) return <p className="p-8">Bien introuvable.</p>;
 
   async function handleSubmit(updated: Bien) {
-    await save({ ...data!, biens: data!.biens.map((b) => (b.id === updated.id ? updated : b)) });
-    router.push('/');
+    const result = await save({
+      ...data,
+      biens: data.biens.map((b) => (b.id === updated.id ? updated : b)),
+    });
+    // Only leave the form once the save really succeeded: on a conflict or an
+    // error the user must keep their input and see the modal / error banner.
+    if (result.ok === true) router.push('/');
   }
 
   return (
@@ -31,4 +31,8 @@ export default function BienDetailPage() {
       onCancel={() => router.push('/')}
     />
   );
+}
+
+export default function BienDetailPage() {
+  return <DataPageShell>{(ctx) => <BienEditor {...ctx} />}</DataPageShell>;
 }
