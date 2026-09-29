@@ -7,8 +7,9 @@ import {
   calculRentabiliteNettePourcent,
   calculMaxEncheres,
   trouverLoyerM2,
+  calculMontageFinancier,
 } from './calculations';
-import type { Bien, ReferentielLoyer } from './types';
+import type { Bien, ReferentielLoyer, MontageFinancier } from './types';
 
 function makeBien(overrides: Partial<Bien> = {}): Bien {
   return {
@@ -111,5 +112,29 @@ describe('calculMaxEncheres', () => {
   it('returns 0 instead of dividing by zero when the target yield is 0%', () => {
     const bien = makeBien();
     expect(calculMaxEncheres(bien, referentiel, 0)).toBe(0);
+  });
+});
+
+describe('calculMontageFinancier', () => {
+  it('matches the original spreadsheet scenario', () => {
+    const montage: MontageFinancier = {
+      prixAchat: 161000.21,
+      prixTravaux: 0,
+      tauxCredit: 2.9,
+      dureeCreditAnnees: 25,
+      loyerHypothese: 1200,
+      pno: 20,
+      assuranceEmprunteurMensuel: 20,
+      chargesMensuelles: 170.0833333,
+      enveloppeImprevus: 25,
+      gestionGliPourcent: 7.5,
+    };
+    const resultat = calculMontageFinancier(montage);
+    expect(resultat.mensualiteBanque).toBeCloseTo(755.1336298, 4);
+    expect(resultat.gestionGli).toBeCloseTo(90, 4);
+    expect(resultat.totalMensualite).toBeCloseTo(1080.216963, 3);
+    expect(resultat.cashflow).toBeCloseTo(119.7830369, 3);
+    expect(resultat.rendementBrutPourcent).toBeCloseTo(8.944, 3);
+    expect(resultat.rendementNetPourcent).toBeCloseTo(7.677, 2);
   });
 });

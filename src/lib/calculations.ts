@@ -1,4 +1,4 @@
-import type { Bien, ReferentielLoyer } from './types';
+import type { Bien, ReferentielLoyer, MontageFinancier } from './types';
 
 export function calculPmtMensuel(
   capital: number,
@@ -55,4 +55,26 @@ export function calculMaxEncheres(
   if (objectifRentabilitePourcent <= 0) return 0;
   const loyerNetMensuel = calculLoyerMoyenMensuel(bien, referentielLoyers) - chargesMensuellesFixes(bien);
   return (loyerNetMensuel * 12) / (objectifRentabilitePourcent / 100);
+}
+
+export interface MontageFinancierResultat {
+  mensualiteBanque: number;
+  gestionGli: number;
+  totalMensualite: number;
+  cashflow: number;
+  rendementBrutPourcent: number;
+  rendementNetPourcent: number;
+}
+
+export function calculMontageFinancier(m: MontageFinancier): MontageFinancierResultat {
+  const capital = m.prixAchat + m.prixTravaux;
+  const mensualiteBanque = calculPmtMensuel(capital, m.tauxCredit, m.dureeCreditAnnees);
+  const gestionGli = m.loyerHypothese * (m.gestionGliPourcent / 100);
+  const totalMensualite =
+    mensualiteBanque + m.pno + m.assuranceEmprunteurMensuel + m.chargesMensuelles + m.enveloppeImprevus + gestionGli;
+  const cashflow = m.loyerHypothese - totalMensualite;
+  const rendementBrutPourcent = capital > 0 ? (m.loyerHypothese * 12) / capital * 100 : 0;
+  const rendementNetPourcent =
+    capital > 0 ? ((m.loyerHypothese - m.chargesMensuelles) * 12) / capital * 100 : 0;
+  return { mensualiteBanque, gestionGli, totalMensualite, cashflow, rendementBrutPourcent, rendementNetPourcent };
 }
