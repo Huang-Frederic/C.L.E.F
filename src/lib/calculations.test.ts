@@ -135,6 +135,6 @@ describe('calculMontageFinancier', () => {
     expect(resultat.totalMensualite).toBeCloseTo(1080.216963, 3);
     expect(resultat.cashflow).toBeCloseTo(119.7830369, 3);
     expect(resultat.rendementBrutPourcent).toBeCloseTo(8.944, 3);
-    expect(resultat.rendementNetPourcent).toBeCloseTo(7.677, 2);
+    expect(resultat.rendementNetPourcent).toBeCloseTo(7.676388, 3);
   });
 });
