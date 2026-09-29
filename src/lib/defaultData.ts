@@ -1,4 +1,4 @@
-import type { DataStore } from './types';
+import type { Bien, DataStore } from './types';
 
 export function createDefaultDataStore(): DataStore {
   return {
@@ -32,5 +32,31 @@ export function createDefaultDataStore(): DataStore {
       tauxCreditParDefaut: 3,
       dureeCreditParDefautAnnees: 25,
     },
+  };
+}
+
+export function createEmptyBien(id: string): Bien {
+  return {
+    id,
+    lienAnnonce: '',
+    lieu: '',
+    typePiece: '',
+    surfaceSol: 0,
+    surfaceConfort: 0,
+    equipements: {},
+    prixAchat: 0,
+    prixTravaux: 0,
+    tauxCredit: 3,
+    dureeCreditAnnees: 25,
+    loyerM2Override: null,
+    taxeFonciere: 0,
+    chargesCopro: 0,
+    autresCharges: 0,
+    classeEnergie: '',
+    dateVisite: null,
+    dateVente: null,
+    commentaireAntho: '',
+    commentaireGilly: '',
+    commentaireDecision: '',
   };
 }
