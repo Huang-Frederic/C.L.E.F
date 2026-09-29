@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { POST } from './route';
 import * as excelImport from '@/lib/excelImport';
@@ -19,11 +20,7 @@ function buildRequestWithFile(): Request {
 }
 
 describe('POST /api/import', () => {
-  // Note: The following two tests are specified in the task brief but vitest has an issue
-  // with FormData+mocking causing timeouts. The route implementation is correct and
-  // parseWorkbookBuffer is thoroughly tested separately. The no-file test validates the route works.
-
-  it.skip('returns 400 with the validation errors when the workbook is invalid', async () => {
+  it('returns 400 with the validation errors when the workbook is invalid', async () => {
     vi.mocked(excelImport.parseWorkbookBuffer).mockResolvedValue({
       ok: false,
       errors: ['Feuille "Analyse" manquante.'],
@@ -37,7 +34,7 @@ describe('POST /api/import', () => {
     expect(dataStore.saveData).not.toHaveBeenCalled();
   });
 
-  it.skip('replaces the stored data and returns the new modifiedTime when the workbook is valid', async () => {
+  it('replaces the stored data and returns the new modifiedTime when the workbook is valid', async () => {
     const imported = createDefaultDataStore();
     vi.mocked(excelImport.parseWorkbookBuffer).mockResolvedValue({ ok: true, data: imported });
     vi.mocked(dataStore.loadData).mockResolvedValue({
