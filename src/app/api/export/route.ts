@@ -1,0 +1,17 @@
+import { NextResponse } from 'next/server';
+import { loadData } from '@/lib/dataStore';
+import { buildWorkbookBuffer } from '@/lib/excelExport';
+
+export async function GET() {
+  const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+  if (!fileId) throw new Error('GOOGLE_DRIVE_FILE_ID is not set.');
+  const { data } = await loadData(fileId);
+  const buffer = await buildWorkbookBuffer(data);
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="Immo.xlsx"',
+    },
+  });
+}
