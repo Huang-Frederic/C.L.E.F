@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Settings } from '@/lib/types';
 
 interface SettingsPanelProps {
@@ -13,6 +13,13 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
   // even if the parent doesn't feed the updated value back into `settings`
   // synchronously (e.g. while a save is in flight).
   const [local, setLocal] = useState<Settings>(settings);
+
+  // Resync whenever the parent hands us a new `settings` object from an
+  // external source (e.g. a post-conflict reload) so we don't keep echoing a
+  // stale, never-saved local edit on top of freshly-reloaded data.
+  useEffect(() => {
+    setLocal(settings);
+  }, [settings]);
 
   function handleFieldChange(field: keyof Settings, value: number) {
     const next = { ...local, [field]: value };
