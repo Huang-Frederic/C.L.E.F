@@ -2,12 +2,14 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BienDetailPage from './page';
+import { DataStoreProvider } from '@/hooks/useDataStoreContext';
 import { createDefaultDataStore, createEmptyBien } from '@/lib/defaultData';
 
 const push = vi.hoisted(() => vi.fn());
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ id: 'b1' }),
+  usePathname: () => '/biens/b1',
 }));
 
 function dataWithBien() {
@@ -37,7 +39,11 @@ describe('BienDetailPage', () => {
         })
     );
 
-    render(<BienDetailPage />);
+    render(
+      <DataStoreProvider>
+        <BienDetailPage />
+      </DataStoreProvider>
+    );
     const surface = await screen.findByLabelText('Surface sol (m2)');
     await userEvent.clear(surface);
     await userEvent.type(surface, '95');
@@ -57,7 +63,11 @@ describe('BienDetailPage', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, modifiedTime: 'v2' }) })
     );
 
-    render(<BienDetailPage />);
+    render(
+      <DataStoreProvider>
+        <BienDetailPage />
+      </DataStoreProvider>
+    );
     await screen.findByLabelText('Surface sol (m2)');
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
 

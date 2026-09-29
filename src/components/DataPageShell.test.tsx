@@ -3,11 +3,25 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { DataPageShell, type DataPageContext } from './DataPageShell';
+import { DataStoreProvider } from '@/hooks/useDataStoreContext';
 import { createDefaultDataStore } from '@/lib/defaultData';
+
+vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 
 beforeEach(() => {
   vi.restoreAllMocks();
 });
+
+type DataPageShellChildren = Parameters<typeof DataPageShell>[0]['children'];
+
+/** DataPageShell now reads from the shared provider, not its own hook instance. */
+function renderShell(children: DataPageShellChildren) {
+  return render(
+    <DataStoreProvider>
+      <DataPageShell>{children}</DataPageShell>
+    </DataStoreProvider>
+  );
+}
 
 /** A child with unsaved local input, like every real form in the app. */
 function Child({ data, save }: DataPageContext) {
@@ -33,7 +47,7 @@ function stubFetch(...responses: unknown[]) {
 describe('DataPageShell', () => {
   it('replaces the page only for a genuine initial-load failure', async () => {
     stubFetch({ ok: false, json: async () => ({}) });
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
 
     expect(await screen.findByText('Impossible de charger les données.')).toBeInTheDocument();
     expect(screen.queryByLabelText('Champ')).not.toBeInTheDocument();
@@ -46,7 +60,7 @@ describe('DataPageShell', () => {
       { ok: true, json: async () => ({ data: createDefaultDataStore(), modifiedTime: 'v1' }) },
       { ok: false, status: 500, json: async () => ({}) }
     );
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
     await screen.findByLabelText('Champ');
 
     await userEvent.type(screen.getByLabelText('Champ'), 'ma saisie');
@@ -68,7 +82,7 @@ describe('DataPageShell', () => {
       { ok: true, json: async () => ({ data: createDefaultDataStore(), modifiedTime: 'v1' }) },
       { ok: false, status: 409, json: async () => ({ error: 'conflict', currentModifiedTime: 'v2' }) }
     );
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
     await screen.findByLabelText('Champ');
 
     await userEvent.type(screen.getByLabelText('Champ'), 'edit');
@@ -85,7 +99,7 @@ describe('DataPageShell', () => {
       { ok: false, status: 409, json: async () => ({ error: 'conflict', currentModifiedTime: 'v2' }) },
       { ok: true, json: async () => ({ ok: true, modifiedTime: 'v3' }) }
     );
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
     await screen.findByLabelText('Champ');
 
     await userEvent.type(screen.getByLabelText('Champ'), 'mon edit');
@@ -105,7 +119,7 @@ describe('DataPageShell', () => {
       { ok: false, status: 409, json: async () => ({ error: 'conflict', currentModifiedTime: 'v2' }) },
       { ok: false, json: async () => ({}) }
     );
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
     await screen.findByLabelText('Champ');
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
     await screen.findByText('Conflit de sauvegarde');
@@ -121,7 +135,7 @@ describe('DataPageShell', () => {
       { ok: true, json: async () => ({ data: createDefaultDataStore(), modifiedTime: 'v1' }) },
       { ok: true, json: async () => ({ ok: true, modifiedTime: 'v2' }) }
     );
-    render(<DataPageShell>{(ctx) => <Child {...ctx} />}</DataPageShell>);
+    renderShell((ctx) => <Child {...ctx} />);
     await screen.findByLabelText('Champ');
 
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));

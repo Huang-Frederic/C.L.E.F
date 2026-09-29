@@ -17,9 +17,9 @@ export type SaveResult = { ok: true } | { ok: 'conflict' } | { ok: false; error:
 const SAVE_ERROR_MESSAGE = 'Erreur lors de la sauvegarde.';
 const NOT_LOADED_MESSAGE = 'Les données ne sont pas chargées : sauvegarde impossible.';
 
-export function useDataStore() {
+export function useDataStore(enabled = true) {
   const [data, setData] = useState<DataStore | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   // Load errors and save errors are deliberately separate: a load error means
   // there is nothing to show at all, a save error must NOT unmount the form the
   // user is typing in (spec: "les modifications non sauvegardées restent en
@@ -65,8 +65,8 @@ export function useDataStore() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (enabled) fetchData();
+  }, [fetchData, enabled]);
 
   const runSave = useCallback(async (next: DataStore, force: boolean): Promise<SaveResult> => {
     const expectedModifiedTime = modifiedTimeRef.current;

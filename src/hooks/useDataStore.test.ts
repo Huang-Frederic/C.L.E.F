@@ -210,6 +210,20 @@ describe('useDataStore', () => {
     expect(result.current.data).toBeNull();
   });
 
+  // Regression: DataPageShell used to call this hook directly, so every page
+  // navigation mounted a fresh instance and re-fetched from Drive from
+  // scratch. The shared provider (useDataStoreContext) needs to skip the
+  // fetch while on /login, where there's no session yet.
+  it('does not fetch on mount when disabled', () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { result } = renderHook(() => useDataStore(false));
+
+    expect(result.current.loading).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('dismisses a save error without touching the loaded data', async () => {
     const initial = createDefaultDataStore();
     const fetchMock = vi

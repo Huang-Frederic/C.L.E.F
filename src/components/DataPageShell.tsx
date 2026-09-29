@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useState, type ReactNode } from 'react';
-import { useDataStore, type SaveResult } from '@/hooks/useDataStore';
+import type { SaveResult } from '@/hooks/useDataStore';
+import { useDataStoreContext } from '@/hooks/useDataStoreContext';
 import { ConflictModal } from './ConflictModal';
 import type { DataStore } from '@/lib/types';
 
@@ -36,7 +37,7 @@ export function DataPageShell({ children }: DataPageShellProps) {
     resolveConflictReload,
     resolveConflictForce,
     dismissSaveError,
-  } = useDataStore();
+  } = useDataStoreContext();
   const [saved, setSaved] = useState(false);
 
   // Every page's save goes through here, so the outcome of `save()` is always
