@@ -1,0 +1,70 @@
+'use client';
+
+import { useState } from 'react';
+import type { Settings } from '@/lib/types';
+
+interface SettingsPanelProps {
+  settings: Settings;
+  onChange: (settings: Settings) => void;
+}
+
+export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
+  // Local state mirrors `settings` so each keystroke is reflected immediately,
+  // even if the parent doesn't feed the updated value back into `settings`
+  // synchronously (e.g. while a save is in flight).
+  const [local, setLocal] = useState<Settings>(settings);
+
+  function handleFieldChange(field: keyof Settings, value: number) {
+    const next = { ...local, [field]: value };
+    setLocal(next);
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-4 rounded border p-4">
+      <h2 className="font-medium">Paramètres</h2>
+      <div>
+        <label htmlFor="objectifRentabilitePourcent" className="block text-sm font-medium">
+          Objectif rentabilité (%)
+        </label>
+        <input
+          id="objectifRentabilitePourcent"
+          type="number"
+          step="0.1"
+          value={local.objectifRentabilitePourcent}
+          onChange={(e) =>
+            handleFieldChange('objectifRentabilitePourcent', Number(e.target.value) || 0)
+          }
+          className="mt-1 w-full rounded border px-3 py-2"
+        />
+      </div>
+      <div>
+        <label htmlFor="tauxCreditParDefaut" className="block text-sm font-medium">
+          Taux crédit par défaut (%)
+        </label>
+        <input
+          id="tauxCreditParDefaut"
+          type="number"
+          step="0.1"
+          value={local.tauxCreditParDefaut}
+          onChange={(e) => handleFieldChange('tauxCreditParDefaut', Number(e.target.value) || 0)}
+          className="mt-1 w-full rounded border px-3 py-2"
+        />
+      </div>
+      <div>
+        <label htmlFor="dureeCreditParDefautAnnees" className="block text-sm font-medium">
+          Durée crédit par défaut (années)
+        </label>
+        <input
+          id="dureeCreditParDefautAnnees"
+          type="number"
+          value={local.dureeCreditParDefautAnnees}
+          onChange={(e) =>
+            handleFieldChange('dureeCreditParDefautAnnees', Number(e.target.value) || 0)
+          }
+          className="mt-1 w-full rounded border px-3 py-2"
+        />
+      </div>
+    </div>
+  );
+}

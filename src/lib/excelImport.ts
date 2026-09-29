@@ -49,7 +49,12 @@ function toSafeString(value: ExcelJS.CellValue): string {
 
 export async function parseWorkbookBuffer(buffer: Buffer): Promise<ImportResult> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  // exceljs's own type declarations resolve to a different (older, non-generic)
+  // ambient `Buffer` type than this project's @types/node, due to a duplicate
+  // @types/node nested under a transitive dependency (fast-csv). The buffer
+  // value is a real Node Buffer at runtime; the cast below is only needed to
+  // satisfy that structurally-incompatible-but-nominally-identical type.
+  await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
 
   const analyseSheet = workbook.getWorksheet('Analyse');
   const referentielSheet = workbook.getWorksheet('Aide Loyer Moyen');

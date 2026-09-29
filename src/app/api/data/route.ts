@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { loadData, saveData, SaveConflictError } from '@/lib/dataStore';
 import type { DataStore } from '@/lib/types';
 
+// This route always reads/writes the live Google Drive file and must never
+// be statically prerendered or cached at build time.
+export const dynamic = 'force-dynamic';
+
 function getFileId(): string {
   const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
   if (!fileId) throw new Error('GOOGLE_DRIVE_FILE_ID is not set.');

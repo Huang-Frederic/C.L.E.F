@@ -39,7 +39,11 @@ describe('buildWorkbookBuffer', () => {
 
     const buffer = await buildWorkbookBuffer(data);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(buffer);
+    // See the comment in src/lib/excelImport.ts: exceljs's `.load()` type
+    // resolves to a different (older, non-generic) ambient `Buffer` than this
+    // project's @types/node, due to a duplicate @types/node nested under the
+    // transitive fast-csv dependency. The cast is purely to satisfy that.
+    await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
 
     const analyse = workbook.getWorksheet('Analyse');
     expect(analyse).toBeDefined();
@@ -54,7 +58,11 @@ describe('buildWorkbookBuffer', () => {
 
     const buffer = await buildWorkbookBuffer(data);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(buffer);
+    // See the comment in src/lib/excelImport.ts: exceljs's `.load()` type
+    // resolves to a different (older, non-generic) ambient `Buffer` than this
+    // project's @types/node, due to a duplicate @types/node nested under the
+    // transitive fast-csv dependency. The cast is purely to satisfy that.
+    await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
 
     const referentiel = workbook.getWorksheet('Aide Loyer Moyen');
     expect(referentiel!.getRow(2).getCell(1).value).toBe('Paris');
