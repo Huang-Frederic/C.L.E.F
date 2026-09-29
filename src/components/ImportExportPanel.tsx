@@ -7,10 +7,20 @@ interface ImportExportPanelProps {
   onImportSuccess?: () => void;
 }
 
+const CONFIRM_MESSAGE =
+  "Importer ce fichier remplacera TOUTES les données partagées (biens, référentiel, barème, emails, montage, paramètres) et cette action est irréversible. Continuer ?";
+
 export function ImportExportPanel({ onImportError, onImportSuccess }: ImportExportPanelProps) {
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const input = event.target;
+    const file = input.files?.[0];
     if (!file) return;
+    // Import overwrites the whole shared dataset for everyone: ask first.
+    if (!window.confirm(CONFIRM_MESSAGE)) {
+      // Reset so picking the same file again re-triggers the change event.
+      input.value = '';
+      return;
+    }
     const formData = new FormData();
     formData.set('file', file);
     const res = await fetch('/api/import', { method: 'POST', body: formData });

@@ -21,6 +21,10 @@ function buildRequestWithFile(): Request {
 
 describe('POST /api/import', () => {
   it('returns 400 with the validation errors when the workbook is invalid', async () => {
+    vi.mocked(dataStore.loadData).mockResolvedValue({
+      data: createDefaultDataStore(),
+      modifiedTime: '2026-09-29T10:00:00.000Z',
+    });
     vi.mocked(excelImport.parseWorkbookBuffer).mockResolvedValue({
       ok: false,
       errors: ['Feuille "Analyse" manquante.'],
@@ -36,9 +40,10 @@ describe('POST /api/import', () => {
 
   it('replaces the stored data and returns the new modifiedTime when the workbook is valid', async () => {
     const imported = createDefaultDataStore();
+    const current = { ...createDefaultDataStore(), emailTemplates: [{ titre: 'Existant', corps: '' }] };
     vi.mocked(excelImport.parseWorkbookBuffer).mockResolvedValue({ ok: true, data: imported });
     vi.mocked(dataStore.loadData).mockResolvedValue({
-      data: createDefaultDataStore(),
+      data: current,
       modifiedTime: '2026-09-29T10:00:00.000Z',
     });
     vi.mocked(dataStore.saveData).mockResolvedValue('2026-09-29T10:05:00.000Z');
@@ -49,6 +54,9 @@ describe('POST /api/import', () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({ ok: true, modifiedTime: '2026-09-29T10:05:00.000Z' });
     expect(dataStore.saveData).toHaveBeenCalledWith('file-123', imported, '2026-09-29T10:00:00.000Z', true);
+    // The currently stored data is passed as the merge base so sections absent
+    // from the workbook aren't reset to the hardcoded defaults.
+    expect(excelImport.parseWorkbookBuffer).toHaveBeenCalledWith(expect.any(Buffer), current);
   });
 
   it('returns 400 when no file is provided', async () => {
