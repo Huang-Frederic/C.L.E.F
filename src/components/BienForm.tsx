@@ -42,7 +42,7 @@ export function BienForm({ bien, referentielLoyers, baremeConfort, onSubmit, onC
         <select
           id="lieu"
           value={form.lieu}
-          onChange={(e) => setForm({ ...form, lieu: e.target.value })}
+          onChange={(e) => setForm({ ...form, lieu: e.target.value, typePiece: '' })}
           className="mt-1 w-full rounded border px-3 py-2"
         >
           <option value="">—</option>

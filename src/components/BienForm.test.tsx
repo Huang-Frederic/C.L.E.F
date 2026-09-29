@@ -59,4 +59,26 @@ describe('BienForm', () => {
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ surfaceConfort: 8 }));
   });
+
+  it('resets typePiece when the ville changes', async () => {
+    const multiVilleReferentiel: ReferentielLoyer[] = [
+      { ville: 'Eaubonne', typePiece: '4P+', loyerM2: 12.9 },
+      { ville: 'Sannois', typePiece: 'T2', loyerM2: 14.2 },
+    ];
+    const onSubmit = vi.fn();
+    render(
+      <BienForm
+        bien={makeBien({ lieu: 'Eaubonne', typePiece: '4P+' })}
+        referentielLoyers={multiVilleReferentiel}
+        baremeConfort={baremeConfort}
+        onSubmit={onSubmit}
+        onCancel={vi.fn()}
+      />
+    );
+
+    await userEvent.selectOptions(screen.getByLabelText('Ville'), 'Sannois');
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ lieu: 'Sannois', typePiece: '' }));
+  });
 });
