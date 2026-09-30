@@ -1,3 +1,7 @@
 node_modules/
 .next/
 .env.local
+.superpowers/
+Immo.xlsx
+data.json
+*.tsbuildinfo

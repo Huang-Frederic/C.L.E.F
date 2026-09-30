@@ -10,7 +10,7 @@ function BienEditor({ data, save }: DataPageContext) {
   const params = useParams<{ id: string }>();
 
   const bien = data.biens.find((b) => b.id === params.id);
-  if (!bien) return <p className="p-8">Bien introuvable.</p>;
+  if (!bien) return <p className="p-8 text-ink-soft">Bien introuvable.</p>;
 
   async function handleSubmit(updated: Bien) {
     const result = await save({

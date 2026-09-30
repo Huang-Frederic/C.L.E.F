@@ -37,52 +37,57 @@ export function BaremeConfortTable({ rows, onSave }: BaremeConfortTableProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-8">
-      <h1 className="mb-4 text-xl font-semibold">Barème confort</h1>
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="border-b text-left">
-            <th className="p-2">Équipement</th>
-            <th className="p-2">m² bonus</th>
-            <th className="p-2" />
-          </tr>
-        </thead>
-        <tbody>
-          {local.map((row, index) => (
-            <tr key={index} className="border-b">
-              <td className="p-2">
-                <input
-                  aria-label={`Équipement ligne ${index + 1}`}
-                  value={row.label}
-                  onChange={(e) => updateRow(index, { label: e.target.value })}
-                  className="w-full rounded border px-2 py-1"
-                />
-              </td>
-              <td className="p-2">
-                <input
-                  aria-label={`m² bonus ligne ${index + 1}`}
-                  type="number"
-                  value={row.m2Bonus}
-                  onChange={(e) => updateRow(index, { m2Bonus: Number(e.target.value) || 0 })}
-                  className="w-full rounded border px-2 py-1"
-                />
-              </td>
-              <td className="p-2">
-                <button type="button" onClick={() => removeRow(index)} className="text-red-600">
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-4 flex gap-2">
-        <button type="button" onClick={addRow} className="rounded border px-4 py-2">
-          Ajouter une ligne
-        </button>
-        <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
-          Enregistrer
-        </button>
+    <form onSubmit={handleSubmit} className="p-3 sm:p-8">
+      <div className="mb-3 border-b border-line pb-2 sm:mb-6 sm:pb-4">
+        <h1 className="font-serif text-lg text-ink sm:text-2xl">Barème confort</h1>
+        <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
+          <button
+            type="button"
+            onClick={addRow}
+            className="border border-line px-3 py-1.5 text-xs text-ink-soft hover:border-ink-soft hover:text-ink sm:px-4 sm:py-2 sm:text-sm"
+          >
+            Ajouter une ligne
+          </button>
+          <button
+            type="submit"
+            className="bg-accent px-3 py-1.5 text-xs font-medium text-paper hover:bg-accent-dark sm:px-4 sm:py-2 sm:text-sm"
+          >
+            Enregistrer
+          </button>
+        </div>
+      </div>
+      {/* A tall stacked tile (badge / label / delete, each on its own line) cost
+          ~130px per item; flattened into one row it's ~40px, so the same 8
+          equipements fit in roughly a third of the vertical space. */}
+      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+        {local.map((row, index) => (
+          <div key={index} className="flex items-center gap-2 border border-line bg-paper-raised p-2">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
+              <input
+                aria-label={`m² bonus ligne ${index + 1}`}
+                type="number"
+                value={row.m2Bonus}
+                onChange={(e) => updateRow(index, { m2Bonus: Number(e.target.value) || 0 })}
+                className="w-6 border-0 bg-transparent text-center font-mono text-xs font-medium text-accent-dark focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            </div>
+            <input
+              aria-label={`Équipement ligne ${index + 1}`}
+              value={row.label}
+              onChange={(e) => updateRow(index, { label: e.target.value })}
+              className="min-w-0 flex-1 border-0 border-b border-line bg-transparent py-0.5 text-xs text-ink focus:border-accent focus:outline-none focus:ring-0 sm:text-sm"
+            />
+            <span className="shrink-0 font-mono text-[10px] text-ink-soft">m²</span>
+            <button
+              type="button"
+              onClick={() => removeRow(index)}
+              aria-label={`Supprimer ligne ${index + 1}`}
+              className="shrink-0 text-sm text-warn hover:text-warn/70"
+            >
+              ×
+            </button>
+          </div>
+        ))}
       </div>
     </form>
   );

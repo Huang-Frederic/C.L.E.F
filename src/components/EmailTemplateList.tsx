@@ -41,42 +41,53 @@ export function EmailTemplateList({ templates, onSave }: EmailTemplateListProps)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-8">
-      <h1 className="text-xl font-semibold">Templates email</h1>
+    <form onSubmit={handleSubmit} className="space-y-4 p-3 sm:space-y-6 sm:p-8">
+      <h1 className="border-b border-line pb-2 font-serif text-lg text-ink sm:pb-4 sm:text-2xl">Templates email</h1>
       {local.map((template, index) => (
-        <div key={index} className="space-y-2 rounded border p-4">
+        <div key={index} className="space-y-2 border-t-2 border-ink bg-paper-raised p-3 sm:space-y-3 sm:p-5">
           <input
             aria-label={`Titre du modèle ${index + 1}`}
             value={template.titre}
             onChange={(e) => updateTemplate(index, { titre: e.target.value })}
-            className="w-full rounded border px-3 py-2 font-medium"
+            className="w-full border-0 border-b border-line bg-transparent py-1 font-serif text-base text-ink focus:border-accent focus:outline-none focus:ring-0 sm:text-lg"
             placeholder="Titre"
           />
           <textarea
             aria-label={`Corps du modèle ${index + 1}`}
             value={template.corps}
             onChange={(e) => updateTemplate(index, { corps: e.target.value })}
-            className="h-40 w-full rounded border px-3 py-2"
+            className="h-28 w-full border border-line bg-paper p-2.5 text-xs text-ink focus:border-accent focus:outline-none focus:ring-0 sm:h-40 sm:p-3 sm:text-sm"
           />
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => copyToClipboard(template.corps)}
-              className="rounded border px-4 py-2"
+              className="border border-line px-3 py-1 text-xs text-ink-soft hover:border-ink-soft hover:text-ink sm:px-4 sm:py-1.5 sm:text-sm"
             >
               Copier
             </button>
-            <button type="button" onClick={() => removeTemplate(index)} className="px-4 py-2 text-red-600">
+            <button
+              type="button"
+              onClick={() => removeTemplate(index)}
+              className="px-3 py-1 text-xs text-warn hover:underline sm:px-4 sm:py-1.5 sm:text-sm"
+            >
               Supprimer
             </button>
           </div>
         </div>
       ))}
-      <div className="flex gap-2">
-        <button type="button" onClick={addTemplate} className="rounded border px-4 py-2">
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={addTemplate}
+          className="border border-line px-3 py-1.5 text-xs text-ink-soft hover:border-ink-soft hover:text-ink sm:px-4 sm:py-2 sm:text-sm"
+        >
           Ajouter un modèle
         </button>
-        <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
+        <button
+          type="submit"
+          className="bg-accent px-3 py-1.5 text-xs font-medium text-paper hover:bg-accent-dark sm:px-4 sm:py-2 sm:text-sm"
+        >
           Enregistrer
         </button>
       </div>

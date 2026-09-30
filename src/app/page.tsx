@@ -15,14 +15,14 @@ export default function HomePage() {
     <DataPageShell>
       {({ data, save }) => (
         <>
-          <div className="flex items-center justify-between p-8 pb-0">
+          <div className="flex items-center justify-between p-3 pb-0 sm:p-8 sm:pb-0">
             <ImportExportPanel
               onImportError={setImportErrors}
               onImportSuccess={() => window.location.reload()}
             />
           </div>
           {importErrors && (
-            <div className="mx-8 mt-4 rounded border border-red-400 bg-red-50 p-4 text-sm text-red-700">
+            <div className="mx-3 mt-3 border-l-4 border-warn bg-warn/[0.08] p-3 text-xs text-warn sm:mx-8 sm:mt-4 sm:p-4 sm:text-sm">
               <p className="font-medium">Import refusé :</p>
               <ul className="list-disc pl-5">
                 {importErrors.map((err) => (
@@ -31,6 +31,14 @@ export default function HomePage() {
               </ul>
             </div>
           )}
+          <div className="px-3 pt-3 sm:px-8 sm:pt-4">
+            <SettingsPanel
+              settings={data.settings}
+              onSave={(settings) => {
+                void save({ ...data, settings });
+              }}
+            />
+          </div>
           <BienTable
             biens={data.biens}
             referentielLoyers={data.referentielLoyers}
@@ -41,14 +49,6 @@ export default function HomePage() {
               void save({ ...data, biens: data.biens.filter((b) => b.id !== id) });
             }}
           />
-          <div className="px-8 pb-8">
-            <SettingsPanel
-              settings={data.settings}
-              onSave={(settings) => {
-                void save({ ...data, settings });
-              }}
-            />
-          </div>
         </>
       )}
     </DataPageShell>

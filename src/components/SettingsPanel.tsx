@@ -32,10 +32,10 @@ export function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded border p-4">
-      <h2 className="font-medium">Paramètres</h2>
+    <form onSubmit={handleSubmit} className="space-y-2.5 border border-line p-3 sm:space-y-4 sm:p-5">
+      <h2 className="font-serif text-base text-ink sm:text-lg">Paramètres</h2>
       <div>
-        <label htmlFor="objectifRentabilitePourcent" className="block text-sm font-medium">
+        <label htmlFor="objectifRentabilitePourcent" className="block text-xs text-ink-soft sm:text-sm">
           Objectif rentabilité (%)
         </label>
         <input
@@ -46,11 +46,11 @@ export function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
           onChange={(e) =>
             handleFieldChange('objectifRentabilitePourcent', Number(e.target.value) || 0)
           }
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full border-0 border-b border-line bg-transparent py-1 font-mono tabular-nums text-ink focus:border-accent focus:outline-none focus:ring-0 sm:mt-2 sm:py-1.5"
         />
       </div>
       <div>
-        <label htmlFor="tauxCreditParDefaut" className="block text-sm font-medium">
+        <label htmlFor="tauxCreditParDefaut" className="block text-xs text-ink-soft sm:text-sm">
           Taux crédit par défaut (%)
         </label>
         <input
@@ -59,11 +59,11 @@ export function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
           step="0.1"
           value={local.tauxCreditParDefaut}
           onChange={(e) => handleFieldChange('tauxCreditParDefaut', Number(e.target.value) || 0)}
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full border-0 border-b border-line bg-transparent py-1 font-mono tabular-nums text-ink focus:border-accent focus:outline-none focus:ring-0 sm:mt-2 sm:py-1.5"
         />
       </div>
       <div>
-        <label htmlFor="dureeCreditParDefautAnnees" className="block text-sm font-medium">
+        <label htmlFor="dureeCreditParDefautAnnees" className="block text-xs text-ink-soft sm:text-sm">
           Durée crédit par défaut (années)
         </label>
         <input
@@ -73,10 +73,13 @@ export function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
           onChange={(e) =>
             handleFieldChange('dureeCreditParDefautAnnees', Number(e.target.value) || 0)
           }
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full border-0 border-b border-line bg-transparent py-1 font-mono tabular-nums text-ink focus:border-accent focus:outline-none focus:ring-0 sm:mt-2 sm:py-1.5"
         />
       </div>
-      <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
+      <button
+        type="submit"
+        className="bg-accent px-3 py-1.5 text-xs font-medium text-paper hover:bg-accent-dark sm:px-4 sm:py-2 sm:text-sm"
+      >
         Enregistrer les paramètres
       </button>
     </form>

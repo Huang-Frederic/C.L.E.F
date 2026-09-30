@@ -33,11 +33,14 @@ export function ImportExportPanel({ onImportError, onImportSuccess }: ImportExpo
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <a href="/api/export" className="rounded border px-4 py-2">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <a
+        href="/api/export"
+        className="border border-line px-3 py-1.5 text-xs text-ink-soft hover:border-ink-soft hover:text-ink sm:px-4 sm:py-2 sm:text-sm"
+      >
         Exporter en Excel
       </a>
-      <label className="rounded border px-4 py-2">
+      <label className="cursor-pointer border border-line px-3 py-1.5 text-xs text-ink-soft hover:border-ink-soft hover:text-ink sm:px-4 sm:py-2 sm:text-sm">
         Importer un Excel
         <input
           type="file"

@@ -34,12 +34,18 @@ function makeBien(overrides: Partial<Bien> = {}): Bien {
   };
 }
 
+// BienTable renders BOTH a mobile card list (`md:hidden`) and a desktop table
+// (`hidden md:block`) so a phone gets a real card layout instead of a squeezed
+// table. jsdom has no real CSS cascade in these component tests, so it never
+// applies either `hidden` — both representations are simultaneously "visible"
+// to Testing Library, and every assertion below expects two matches (one per
+// representation) rather than one.
 describe('BienTable', () => {
   it('renders the computed rentabilité nette for each bien', () => {
     render(
       <BienTable biens={[makeBien()]} referentielLoyers={referentielLoyers} settings={settings} onDelete={vi.fn()} onAdd={vi.fn()} />
     );
-    expect(screen.getByText('6.65%')).toBeInTheDocument();
+    expect(screen.getAllByText('6.65%')).toHaveLength(2);
   });
 
   it('shows a warning instead of a number when the référentiel has no match', () => {
@@ -52,7 +58,8 @@ describe('BienTable', () => {
         onAdd={vi.fn()}
       />
     );
-    expect(screen.getAllByText('loyer inconnu')).toHaveLength(3);
+    // 3 unknown metrics (breakeven, rentabilité, max enchères) x 2 representations.
+    expect(screen.getAllByText('loyer inconnu')).toHaveLength(6);
   });
 
   it('calls onDelete with the bien id when the delete button is clicked', async () => {
@@ -60,7 +67,8 @@ describe('BienTable', () => {
     render(
       <BienTable biens={[makeBien()]} referentielLoyers={referentielLoyers} settings={settings} onDelete={onDelete} onAdd={vi.fn()} />
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }));
+    const [deleteButton] = screen.getAllByRole('button', { name: 'Supprimer' });
+    await userEvent.click(deleteButton);
     expect(onDelete).toHaveBeenCalledWith('b1');
   });
 
@@ -69,5 +77,46 @@ describe('BienTable', () => {
     render(<BienTable biens={[]} referentielLoyers={referentielLoyers} settings={settings} onDelete={vi.fn()} onAdd={onAdd} />);
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter un bien' }));
     expect(onAdd).toHaveBeenCalled();
+  });
+
+  it('has a dedicated Modifier link to the bien detail page', () => {
+    render(
+      <BienTable biens={[makeBien()]} referentielLoyers={referentielLoyers} settings={settings} onDelete={vi.fn()} onAdd={vi.fn()} />
+    );
+    const links = screen.getAllByRole('link', { name: 'Modifier' });
+    expect(links).toHaveLength(2);
+    for (const link of links) expect(link).toHaveAttribute('href', '/biens/b1');
+  });
+
+  it('links straight to the listing URL, opening in a new tab', () => {
+    render(
+      <BienTable
+        biens={[makeBien({ lienAnnonce: 'https://www.seloger.com/annonce/123' })]}
+        referentielLoyers={referentielLoyers}
+        settings={settings}
+        onDelete={vi.fn()}
+        onAdd={vi.fn()}
+      />
+    );
+    const links = screen.getAllByRole('link', { name: "Voir l'annonce" });
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', 'https://www.seloger.com/annonce/123');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    }
+  });
+
+  it('does not show a listing link when the bien has no lienAnnonce', () => {
+    render(
+      <BienTable
+        biens={[makeBien({ lienAnnonce: '' })]}
+        referentielLoyers={referentielLoyers}
+        settings={settings}
+        onDelete={vi.fn()}
+        onAdd={vi.fn()}
+      />
+    );
+    expect(screen.queryByRole('link', { name: "Voir l'annonce" })).not.toBeInTheDocument();
   });
 });
