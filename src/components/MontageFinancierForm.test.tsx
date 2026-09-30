@@ -13,6 +13,7 @@ const montage: MontageFinancier = {
   pno: 20,
   assuranceEmprunteurMensuel: 20,
   chargesMensuelles: 170.0833333,
+  taxeFonciere: 0,
   enveloppeImprevus: 25,
   gestionGliPourcent: 7.5,
 };
@@ -21,6 +22,13 @@ describe('MontageFinancierForm', () => {
   it('shows the computed cashflow for the given inputs', () => {
     render(<MontageFinancierForm montage={montage} onSave={vi.fn()} />);
     expect(screen.getByText((content) => content.includes('119.78 €'))).toBeInTheDocument();
+  });
+
+  it('folds the annual taxe foncière into the computed cashflow', () => {
+    render(<MontageFinancierForm montage={{ ...montage, taxeFonciere: 1200 }} onSave={vi.fn()} />);
+    expect(screen.getByLabelText('Taxe foncière /an')).toHaveValue(1200);
+    // Same scenario as above, minus 1200/12 = 100 €/month of taxe foncière.
+    expect(screen.getByText((content) => content.includes('19.78 €'))).toBeInTheDocument();
   });
 
   // Regression: the fields were fully controlled by the parent's saved state,

@@ -42,6 +42,7 @@ export interface MontageFinancier {
   pno: number;
   assuranceEmprunteurMensuel: number;
   chargesMensuelles: number;
+  taxeFonciere: number;
   enveloppeImprevus: number;
   gestionGliPourcent: number;
 }

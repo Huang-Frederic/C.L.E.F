@@ -23,6 +23,7 @@ export function createDefaultDataStore(): DataStore {
       pno: 0,
       assuranceEmprunteurMensuel: 0,
       chargesMensuelles: 0,
+      taxeFonciere: 0,
       enveloppeImprevus: 0,
       gestionGliPourcent: 7.5,
     },

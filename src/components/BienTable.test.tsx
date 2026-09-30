@@ -48,6 +48,14 @@ describe('BienTable', () => {
     expect(screen.getAllByText('6.65%')).toHaveLength(2);
   });
 
+  it('renders the computed loyer moyen mensuel for each bien', () => {
+    render(
+      <BienTable biens={[makeBien()]} referentielLoyers={referentielLoyers} settings={settings} onDelete={vi.fn()} onAdd={vi.fn()} />
+    );
+    // (surfaceSol 95 + surfaceConfort 30) x loyerM2 12.9 = 1612.50
+    expect(screen.getAllByText('1612.50 €')).toHaveLength(2);
+  });
+
   it('shows a warning instead of a number when the référentiel has no match', () => {
     render(
       <BienTable
@@ -58,8 +66,8 @@ describe('BienTable', () => {
         onAdd={vi.fn()}
       />
     );
-    // 3 unknown metrics (breakeven, rentabilité, max enchères) x 2 representations.
-    expect(screen.getAllByText('loyer inconnu')).toHaveLength(6);
+    // 4 unknown metrics (loyer moyen, breakeven, rentabilité, max enchères) x 2 representations.
+    expect(screen.getAllByText('loyer inconnu')).toHaveLength(8);
   });
 
   it('calls onDelete with the bien id when the delete button is clicked', async () => {

@@ -82,6 +82,7 @@ export const MONTAGE_HEADERS: Record<keyof MontageFinancier, string> = {
   pno: 'PNO',
   assuranceEmprunteurMensuel: 'Assurance emprunteur / mois',
   chargesMensuelles: 'Charges mensuelles',
+  taxeFonciere: 'Taxe foncière /an',
   enveloppeImprevus: 'Enveloppe imprévus',
   gestionGliPourcent: 'Gestion + GLI %',
 };

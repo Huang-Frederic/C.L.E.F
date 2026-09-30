@@ -18,6 +18,7 @@ const FIELDS: Array<{ key: keyof MontageFinancier; label: string }> = [
   { key: 'pno', label: 'PNO' },
   { key: 'assuranceEmprunteurMensuel', label: 'Assurance emprunteur / mois' },
   { key: 'chargesMensuelles', label: 'Charges mensuelles' },
+  { key: 'taxeFonciere', label: 'Taxe foncière /an' },
   { key: 'enveloppeImprevus', label: 'Enveloppe imprévus' },
   { key: 'gestionGliPourcent', label: 'Gestion + GLI (%)' },
 ];

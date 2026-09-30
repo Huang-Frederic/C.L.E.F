@@ -29,6 +29,24 @@ describe('loadData', () => {
 
     expect(result.data).toEqual(createDefaultDataStore());
   });
+
+  // Regression: `taxeFonciere` was added to `MontageFinancier` after real data
+  // had already been saved to Drive without it, so `montage.taxeFonciere` was
+  // `undefined` and every calculation using it (totalMensualite, cashflow)
+  // silently became NaN. Loaded data must be backfilled at this boundary so
+  // every other consumer can keep assuming a complete `MontageFinancier`.
+  it('backfills montageFinancier.taxeFonciere to 0 for data saved before that field existed', async () => {
+    const stored = createDefaultDataStore();
+    // Simulate a pre-existing Drive file: no `taxeFonciere` key at all.
+    const { taxeFonciere: _omit, ...montageWithoutTaxeFonciere } = stored.montageFinancier;
+    const storedJson = { ...stored, montageFinancier: montageWithoutTaxeFonciere };
+    vi.mocked(driveClient.getFileContent).mockResolvedValue(JSON.stringify(storedJson));
+    vi.mocked(driveClient.getFileModifiedTime).mockResolvedValue('2026-09-29T10:00:00.000Z');
+
+    const result = await loadData('file-123');
+
+    expect(result.data.montageFinancier.taxeFonciere).toBe(0);
+  });
 });
 
 describe('saveData', () => {

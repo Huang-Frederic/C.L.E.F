@@ -66,6 +66,7 @@ function makeFullDataStore(): DataStore {
       pno: 20,
       assuranceEmprunteurMensuel: 21,
       chargesMensuelles: 170.5,
+      taxeFonciere: 950,
       enveloppeImprevus: 25,
       gestionGliPourcent: 7.5,
     },

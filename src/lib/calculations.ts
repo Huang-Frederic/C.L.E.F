@@ -70,11 +70,18 @@ export function calculMontageFinancier(m: MontageFinancier): MontageFinancierRes
   const capital = m.prixAchat + m.prixTravaux;
   const mensualiteBanque = calculPmtMensuel(capital, m.tauxCredit, m.dureeCreditAnnees);
   const gestionGli = m.loyerHypothese * (m.gestionGliPourcent / 100);
+  const taxeFonciereMensuelle = m.taxeFonciere / 12;
   const totalMensualite =
-    mensualiteBanque + m.pno + m.assuranceEmprunteurMensuel + m.chargesMensuelles + m.enveloppeImprevus + gestionGli;
+    mensualiteBanque +
+    m.pno +
+    m.assuranceEmprunteurMensuel +
+    m.chargesMensuelles +
+    taxeFonciereMensuelle +
+    m.enveloppeImprevus +
+    gestionGli;
   const cashflow = m.loyerHypothese - totalMensualite;
   const rendementBrutPourcent = capital > 0 ? (m.loyerHypothese * 12) / capital * 100 : 0;
   const rendementNetPourcent =
-    capital > 0 ? ((m.loyerHypothese - m.chargesMensuelles) * 12) / capital * 100 : 0;
+    capital > 0 ? ((m.loyerHypothese - m.chargesMensuelles - taxeFonciereMensuelle) * 12) / capital * 100 : 0;
   return { mensualiteBanque, gestionGli, totalMensualite, cashflow, rendementBrutPourcent, rendementNetPourcent };
 }

@@ -23,6 +23,11 @@ export async function loadData(fileId: string): Promise<LoadedData> {
     getFileModifiedTime(fileId),
   ]);
   const data: DataStore = content.trim().length > 0 ? JSON.parse(content) : createDefaultDataStore();
+  // There is no database and no migration step: a field added to a nested
+  // type (like `taxeFonciere` here) is simply absent from Drive files saved
+  // before it existed. Backfill it once at this boundary so every consumer
+  // (calculations, forms) can keep assuming a complete `MontageFinancier`.
+  data.montageFinancier.taxeFonciere ??= 0;
   return { data, modifiedTime };
 }
 

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { Bien, ReferentielLoyer, Settings } from '@/lib/types';
 import {
+  calculLoyerMoyenMensuel,
   calculMensualiteCredit,
   calculMensualiteBreakeven,
   calculRentabiliteNettePourcent,
@@ -33,6 +34,7 @@ function computeRow(bien: Bien, referentielLoyers: ReferentielLoyer[], settings:
     rentabilite,
     accentClass,
     rentabiliteClass,
+    loyerMoyen: loyerM2 === null ? null : `${calculLoyerMoyenMensuel(bien, referentielLoyers).toFixed(2)} €`,
     mensualite: `${calculMensualiteCredit(bien).toFixed(2)} €`,
     breakeven: loyerM2 === null ? null : `${calculMensualiteBreakeven(bien, referentielLoyers).toFixed(2)} €`,
     rentabiliteLabel: rentabilite === null ? null : `${rentabilite.toFixed(2)}%`,
@@ -87,6 +89,10 @@ export function BienTable({ biens, referentielLoyers, settings, onDelete, onAdd 
               </div>
             </div>
             <dl className="grid grid-cols-2 gap-y-0.5 text-xs">
+              <dt className="text-ink-soft">Loyer moyen</dt>
+              <dd className="text-right font-mono tabular-nums text-ink">
+                {row.loyerMoyen ?? <span className="font-sans text-ink-soft">{UNKNOWN_RENT}</span>}
+              </dd>
               <dt className="text-ink-soft">Mensualité</dt>
               <dd className="text-right font-mono tabular-nums text-ink">{row.mensualite}</dd>
               <dt className="text-ink-soft">Breakeven</dt>
@@ -120,6 +126,7 @@ export function BienTable({ biens, referentielLoyers, settings, onDelete, onAdd 
             <tr className="border-b border-ink/20 text-left text-ink-soft">
               <th className="py-2 pr-2 font-normal">Lieu</th>
               <th className="py-2 pr-2 font-normal">Type</th>
+              <th className="py-2 pr-2 text-right font-normal">Loyer moyen</th>
               <th className="py-2 pr-2 text-right font-normal">Mensualité crédit</th>
               <th className="py-2 pr-2 text-right font-normal">Breakeven</th>
               <th className="py-2 pr-2 text-right font-normal">Rentabilité nette</th>
@@ -135,6 +142,9 @@ export function BienTable({ biens, referentielLoyers, settings, onDelete, onAdd 
                   <ListingLink href={row.bien.lienAnnonce} />
                 </td>
                 <td className="py-3 pr-2 text-ink-soft">{row.bien.typePiece}</td>
+                <td className="py-3 pr-2 text-right font-mono tabular-nums text-ink">
+                  {row.loyerMoyen ?? <span className="font-sans text-ink-soft">{UNKNOWN_RENT}</span>}
+                </td>
                 <td className="py-3 pr-2 text-right font-mono tabular-nums text-ink">{row.mensualite}</td>
                 <td className="py-3 pr-2 text-right font-mono tabular-nums text-ink">
                   {row.breakeven ?? <span className="font-sans text-ink-soft">{UNKNOWN_RENT}</span>}
