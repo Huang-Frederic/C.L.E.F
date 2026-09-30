@@ -1,23 +1,32 @@
 import './globals.css';
 import type { ReactNode } from 'react';
-import { Source_Serif_4, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { Nav } from '@/components/Nav';
 import { DataStoreProvider } from '@/hooks/useDataStoreContext';
 
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
+// Self-hosted (latin subset, vendored under ./fonts) instead of next/font/google:
+// that loader fetches from Google's servers at build time, and that fetch failed
+// on Vercel's build machine (unrelated to this app's code). Local files remove
+// the network dependency entirely, so every build is reproducible offline.
+const sourceSerif = localFont({
+  src: './fonts/source-serif-4-400.woff2',
+  weight: '400',
   variable: '--font-source-serif',
   display: 'swap',
 });
-const plexSans = IBM_Plex_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
+// IBM Plex Sans' 400/500/600 all resolve to the same file from Google Fonts —
+// it's a single variable-weight font, so one file with a weight range suffices.
+const plexSans = localFont({
+  src: './fonts/ibm-plex-sans-variable.woff2',
+  weight: '400 600',
   variable: '--font-plex-sans',
   display: 'swap',
 });
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const plexMono = localFont({
+  src: [
+    { path: './fonts/ibm-plex-mono-400.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/ibm-plex-mono-500.woff2', weight: '500', style: 'normal' },
+  ],
   variable: '--font-plex-mono',
   display: 'swap',
 });
